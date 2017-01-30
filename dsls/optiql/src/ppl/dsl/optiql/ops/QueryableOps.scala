@@ -8,7 +8,7 @@ import scala.virtualization.lms.common.{Base, EffectExp, ScalaGenFat, BaseFatExp
 import scala.reflect.{RefinedManifest, SourceContext}
 
 trait QueryableOps extends Base { this: OptiQL =>
-  
+
   implicit def repToQueryableOps[T:Manifest](r: Rep[Table[T]]) = new QOpsCls(r)
   implicit def repGroupingToQueryableOps[K:Manifest, T:Manifest](g: Rep[Grouping[K, T]]) = new QOpsCls(queryable_grouping_toDatatable(g))
 
@@ -334,16 +334,16 @@ trait QueryableOpsExp extends QueryableOps with EffectExp with BaseFatExp with D
     case t if t.erasure == classOf[Grouping[_,_]] => Some((classTag(t), List("key" -> t.typeArguments(0), "values" -> makeManifest(classOf[Table[_]], List(t.typeArguments(1))))))
     case _ => super.unapplyStructType
   }
-  
+
   override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit ctx: SourceContext): Exp[A] = (e match {
-    case e@QueryableSelect(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableSelect(f(in),f(g))(mtype(e.mT),mtype(e.mR)))(mtype(manifest[A]),implicitly[SourceContext])      
+    case e@QueryableSelect(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableSelect(f(in),f(g))(mtype(e.mT),mtype(e.mR)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableSelectMany(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableSelectMany(f(in),f(g))(mtype(e.mT),mtype(e.mR)))(mtype(manifest[A]),implicitly[SourceContext])
-    case e@QueryableWhere(in,c) => reflectPure(new { override val original = Some(f,e) } with QueryableWhere(f(in),f(c))(mtype(e.mT)))(mtype(manifest[A]),implicitly[SourceContext])      
-    case e@QueryableSum(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableSum(f(in),f(g))(mtype(e.mT),ntype(e.N),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])      
-    case e@QueryableAverage(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableAverage(f(in),f(g))(mtype(e.mT),ntype(e.N),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])      
-    case e@QueryableMax(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableMax(f(in),f(g))(mtype(e.mT),otype(e.oN),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])      
-    case e@QueryableMin(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableMin(f(in),f(g))(mtype(e.mT),otype(e.oN),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])      
-    case e@QueryableGroupBy(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableGroupBy(f(in),f(g))(mtype(e.mT),mtype(e.mK)))(mtype(manifest[A]),implicitly[SourceContext])      
+    case e@QueryableWhere(in,c) => reflectPure(new { override val original = Some(f,e) } with QueryableWhere(f(in),f(c))(mtype(e.mT)))(mtype(manifest[A]),implicitly[SourceContext])
+    case e@QueryableSum(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableSum(f(in),f(g))(mtype(e.mT),ntype(e.N),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])
+    case e@QueryableAverage(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableAverage(f(in),f(g))(mtype(e.mT),ntype(e.N),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])
+    case e@QueryableMax(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableMax(f(in),f(g))(mtype(e.mT),otype(e.oN),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])
+    case e@QueryableMin(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableMin(f(in),f(g))(mtype(e.mT),otype(e.oN),mtype(e.mN)))(mtype(manifest[A]),implicitly[SourceContext])
+    case e@QueryableGroupBy(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableGroupBy(f(in),f(g))(mtype(e.mT),mtype(e.mK)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableDistinct(in,g) => reflectPure(new { override val original = Some(f,e) } with QueryableDistinct(f(in),f(g))(mtype(e.mT),mtype(e.mK)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableCount(in) => reflectPure(new { override val original = Some(f,e) } with QueryableCount(f(in))(mtype(e.mA)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableCountWhere(in,c) => reflectPure(new { override val original = Some(f,e) } with QueryableCountWhere(f(in),f(c))(mtype(e.mT)))(mtype(manifest[A]),implicitly[SourceContext])
@@ -351,8 +351,8 @@ trait QueryableOpsExp extends QueryableOps with EffectExp with BaseFatExp with D
     case e@QueryableLast(in) => reflectPure(new { override val original = Some(f,e) } with QueryableLast(f(in))(mtype(e.mR)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableSort(in,comp) => reflectPure(new { override val original = Some(f,e) } with QueryableSort(f(in),f(comp))(mtype(e.mT)))(mtype(manifest[A]),implicitly[SourceContext])
     case _ => super.mirror(e,f)
-  }).asInstanceOf[Exp[A]] 
-  
+  }).asInstanceOf[Exp[A]]
+
 }
 
 trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
@@ -369,7 +369,7 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
     val mK = manifest[K]
   }
 
-  case class QueryableHashReduce[T:Manifest, K:Manifest, R:Manifest](in: Exp[Table[T]], keyFunc: Exp[T] => Exp[K], valFunc: Exp[T] => Exp[R], reduceFunc: (Exp[R],Exp[R]) => Exp[R], cond: Exp[T] => Exp[Boolean]) 
+  case class QueryableHashReduce[T:Manifest, K:Manifest, R:Manifest](in: Exp[Table[T]], keyFunc: Exp[T] => Exp[K], valFunc: Exp[T] => Exp[R], reduceFunc: (Exp[R],Exp[R]) => Exp[R], cond: Exp[T] => Exp[Boolean])
     extends DeliteOpFilteredGroupByReduce[T, K, R, Table[R]] {
 
     def alloc(i: Exp[Int]) = Table[R](i)
@@ -400,6 +400,7 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
     def rewriteMap(value: Exp[Any]) = (value match {
       case Def(Field(s,"key")) => keySelector
       case Def(Field(Def(Field(s,"key")),index)) => (a:Exp[A]) => field(keySelector(a),index)(value.tp,ctx)
+      case Def(FieldApply(s,index)) => (a:Exp[A]) => field(a,index)(value.tp,ctx)
       case Def(QueryableSum(s, sumSelector)) => sumSelector
       case Def(QueryableAverage(s, avgSelector)) => avgSelector
       case Def(QueryableCount(s)) => (a:Exp[A]) => unit(1)
@@ -419,7 +420,8 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
       case Def(QueryableCount(s)) => (a:Exp[N],b:Exp[N]) => numeric_plus(a,b)(ntype(implicitly[Numeric[Int]]),mtype(manifest[Int]),ctx)
       case Def(min@QueryableMin(_,_)) => (a:Exp[N],b:Exp[N]) => ordering_min(a,b)(otype(min.oN),mtype(min.mN),ctx)
       case Def(max@QueryableMax(_,_)) => (a:Exp[N],b:Exp[N]) => ordering_max(a,b)(otype(max.oN),mtype(max.mN),ctx)
-      case _ => failed = true; null
+      case Def(s) => (a: Exp[N], b: Exp[N]) => a
+      case _ => System.out.println("found unknown: " + value.toString); failed = true; null
     }).asInstanceOf[(Exp[N],Exp[N])=>Exp[N]]
 
     def rewriteAverage[N](value: Exp[Any]) = (value match {
@@ -427,9 +429,8 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
       case _ => (a:Exp[N],count:Exp[Int]) => a
     }).asInstanceOf[(Exp[N],Exp[Int])=>Exp[N]]
 
-
     val funcs = resultSelector(fresh[T]) match {
-      case Def(Struct(tag: StructTag[R], elems)) => 
+      case Def(Struct(tag: StructTag[R], elems)) =>
         val valueFunc = (a:Exp[A]) => struct[R](tag, elems map { case (key, value) => (key, rewriteMap(value)(a)) })
         val reduceFunc = (a:Exp[R],b:Exp[R]) => struct[R](tag, elems map { case (key, value) => (key, rewriteReduce(value)(field(a,key)(value.tp,ctx), field(b,key)(value.tp,ctx))) })
         val averageFunc = (a:Exp[R],count:Exp[Int]) => struct[R](tag, elems map { case (key, value) => (key, rewriteAverage(value)(field(a,key)(value.tp,ctx), count)) })
@@ -439,27 +440,28 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
     }
 
     if (failed) None else Some(funcs)
+
   }
-  
+
   override def queryable_select[T:Manifest, R:Manifest](s: Exp[Table[T]], resultSelector: Exp[T] => Exp[R]): Exp[Table[R]] = s match {
     case Def(QueryableWhere(origS, predicate)) => //Where-Select fusion
-      QueryableSelectWhere(origS, resultSelector, predicate) 
-    
+      QueryableSelectWhere(origS, resultSelector, predicate)
+
     case Def(g@QueryableGroupBy(origS: Exp[Table[a]], keySelector)) => hashReduce(resultSelector, keySelector)(g.mT,g.mK,manifest[T],manifest[R]) match { //GroupBy-Select fusion
-      case Some((valueFunc, reduceFunc, averageFunc)) => 
+      case Some((valueFunc, reduceFunc, averageFunc)) =>
         val hr = QueryableHashReduce(origS, keySelector, valueFunc, reduceFunc, (e:Exp[a]) => unit(true))(g.mT,g.mK,manifest[R])
         val count = QueryableHashReduce(origS, keySelector, (e:Exp[a])=>unit(1), (a:Exp[Int],b:Exp[Int])=>a+b, (e:Exp[a])=>unit(true))(g.mT,g.mK,manifest[Int])
         QueryableDivide(hr, count, averageFunc)
-      case None => 
+      case None =>
         Console.println("WARNING: unable to fuse GroupBy-Select")
         return super.queryable_select(s, resultSelector)
-    } 
+    }
     case Def(g@QueryableGroupByWhere(origS: Exp[Table[a]], keySelector, cond)) => hashReduce(resultSelector, keySelector)(g.mT,g.mK,manifest[T],manifest[R]) match {
-      case Some((valueFunc, reduceFunc, averageFunc)) => 
+      case Some((valueFunc, reduceFunc, averageFunc)) =>
         val hr = QueryableHashReduce(origS, keySelector, valueFunc, reduceFunc, cond)(g.mT,g.mK,manifest[R])
         val count = QueryableHashReduce(origS, keySelector, (e:Exp[a]) => unit(1), (a:Exp[Int],b:Exp[Int])=>a+b, cond)(g.mT,g.mK,manifest[Int])
         QueryableDivide(hr, count, averageFunc)
-      case None => 
+      case None =>
         Console.println("WARNING: unable to fuse GroupBy-Select")
         return super.queryable_select(s, resultSelector)
     }
@@ -472,7 +474,7 @@ trait QueryableOpsExpOpt extends QueryableOpsExp { this: OptiQLExp =>
     case e@QueryableHashReduce(in,key,m,r,c) => reflectPure(new { override val original = Some(f,e) } with QueryableHashReduce(f(in),f(key),f(m),f(r),f(c))(mtype(e.mT),mtype(e.mK),mtype(e.mR)))(mtype(manifest[A]),implicitly[SourceContext])
     case e@QueryableDivide(x,y,g) => reflectPure(new { override val original = Some(f,e) } with QueryableDivide(f(x),f(y),f(g))(mtype(e.mT)))(mtype(manifest[A]),implicitly[SourceContext])
     case _ => super.mirror(e,f)
-  }).asInstanceOf[Exp[A]] 
+  }).asInstanceOf[Exp[A]]
 
 }
 

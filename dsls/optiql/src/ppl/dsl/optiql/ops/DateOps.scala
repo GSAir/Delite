@@ -22,6 +22,10 @@ trait DateOps extends Base { this: OptiQL =>
     def >(rd: Rep[Date]): Rep[Boolean] = dateGreaterThan(d,rd)
     def >=(rd: Rep[Date]): Rep[Boolean] = dateGreaterThanEqual(d,rd)
     def !=(rd: Rep[Date]): Rep[Boolean] = dateNotEqual(d,rd)
+    def year: Rep[Int] = dateYear(d)
+    def month: Rep[Int] = dateMonth(d)
+    def day: Rep[Int] = dateDay(d)
+    def toInt: Rep[Int] = dateToInt(d)
   }
 
   def __equal(ld: Rep[Date], rd: Rep[Date]) = dateEqual(ld,rd)
@@ -55,6 +59,10 @@ trait DateOpsExp extends DateOps with BaseExp { this: OptiQLExp =>
   def dateGreaterThanEqual(ld: Rep[Date], rd: Rep[Date]) = optiql_date_gte(ld,rd)
   def dateEqual(ld: Rep[Date], rd: Rep[Date]) = optiql_date_eq(ld,rd)
   def dateNotEqual(ld: Rep[Date], rd: Rep[Date]) = optiql_date_ne(ld,rd)
+  def dateYear(ld: Rep[Date]) = optiql_date_year(ld)
+  def dateMonth(ld: Rep[Date]) = optiql_date_month(ld)
+  def dateDay(ld: Rep[Date]) = optiql_date_day(ld)
+  def dateToInt(ld: Rep[Date]) = optiql_date_toint(ld)
 
 
   override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit ctx: SourceContext): Exp[A] = (e match {
@@ -77,6 +85,10 @@ trait DateImplOps { this: OptiQL =>
   def optiql_date_gt(ld: Rep[Date], rd: Rep[Date]): Rep[Boolean]
   def optiql_date_eq(ld: Rep[Date], rd: Rep[Date]): Rep[Boolean]
   def optiql_date_ne(ld: Rep[Date], rd: Rep[Date]): Rep[Boolean]
+  def optiql_date_year(ld: Rep[Date]): Rep[Int]
+  def optiql_date_month(ld: Rep[Date]): Rep[Int]
+  def optiql_date_day(ld: Rep[Date]): Rep[Int]
+  def optiql_date_toint(ld: Rep[Date]): Rep[Int]
 }
 
 trait DateImplOpsStandard extends DateImplOps with DeliteStructsExp { this: OptiQLExp with OptiQLLift =>
@@ -101,6 +113,11 @@ trait DateImplOpsStandard extends DateImplOps with DeliteStructsExp { this: Opti
   def optiql_date_gt(ld: Rep[Date], rd: Rep[Date]) = ld.toInt > rd.toInt
   def optiql_date_eq(ld: Rep[Date], rd: Rep[Date]) = ld.toInt == rd.toInt
   def optiql_date_ne(ld: Rep[Date], rd: Rep[Date]) = ld.toInt != rd.toInt
+
+  def optiql_date_year(ld: Rep[Date]) = year(ld.toInt)
+  def optiql_date_month(ld: Rep[Date]) = month(ld.toInt)
+  def optiql_date_day(ld: Rep[Date]) = day(ld.toInt)
+  def optiql_date_toint(ld: Rep[Date]) = ld.toInt
 
   //trick to eliminate structs of a single field without relying on struct unwrapping optimizations
   private def infix_toDate(d: Rep[Int]): Rep[Date] = d.asInstanceOf[Rep[Date]] //struct(classTag[Date], "value" -> d)
