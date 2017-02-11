@@ -70,7 +70,7 @@ trait OptiQLCompiler extends OptiQL with IOOps with SeqOps with Variables with W
  * This trait comprises the IR nodes for OptiQL and the code required to instantiate code generators
  */
 trait OptiQLExp extends OptiQLCompiler with OptiQLScalaOpsPkgExp with TableOpsExp with DateOpsExp with DateImplOpsStandard with QueryableOpsExpOpt with OptiQLMiscOpsExp
-  with InputReaderOpsExp with InputReaderImplOpsStandard with DeliteCollectionOpsExp with DeliteOpsExp with DeliteArrayFatExp with DeliteArrayBufferOpsExp with DeliteMapOpsExp with DeliteFileReaderOpsExp with DSArrayOpsExp 
+  with InputReaderOpsExp with InputReaderImplOpsStandard with DeliteCollectionOpsExp with DeliteOpsExp with DeliteArrayFatExp with DeliteArrayBufferOpsExp with DeliteMapOpsExp with DeliteFileReaderOpsExp with DSArrayOpsExp
   with DeliteRestageOpsExp with DeliteTestOpsExp with DeliteLMSForwarderExp with DeliteAllOverridesExp with MultiloopSoATransformWithReduceExp {
 
   this: DeliteApplication with OptiQLApplication =>
@@ -147,16 +147,16 @@ trait OptiQLCodeGenBase extends GenericFatCodegen {
   }
 }
 
-trait OptiQLCodeGenRestage extends OptiQLScalaCodeGenPkg with DeliteCodeGenRestage with LMSCodeGenRestage { 
+trait OptiQLCodeGenRestage extends OptiQLScalaCodeGenPkg with DeliteCodeGenRestage with LMSCodeGenRestage {
   val IR: DeliteApplication with OptiQLExp
   import IR._
 
   // we shouldn't need this if we have a proper lowering stage (i.e. transformation)
-  override def remap[A](m: Manifest[A]): String = {    
+  override def remap[A](m: Manifest[A]): String = {
     m match {
       case m if m.erasure.getSimpleName == "Date" => "Int"
       case _ => super.remap(m)
-    }   
+    }
   }
 }
 
@@ -219,7 +219,7 @@ trait OptiQLCodeGenC extends OptiQLCodeGenBase with OptiQLCCodeGenPkg with CGenD
 // ex. trait TPCH extends OptiQLApplication
 trait OptiQLApplication extends OptiQL with OptiQLLift {
   var args: Rep[Array[String]]
-  def main(): Unit 
+  def main(): Unit
 }
 
 // ex. object TPCHRunner extends OptiQLApplicationRunner with  TPCH

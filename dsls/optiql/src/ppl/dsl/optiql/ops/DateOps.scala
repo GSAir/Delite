@@ -38,12 +38,18 @@ trait DateOps extends Base { this: OptiQL =>
   def dateNotEqual(ld: Rep[Date], rd: Rep[Date]): Rep[Boolean]
   def dateEqual(ld: Rep[Date], rd: Rep[Date]): Rep[Boolean]
 
+
+  def dateYear(ld: Rep[Date]): Rep[Int]
+  def dateMonth(ld: Rep[Date]): Rep[Int]
+  def dateDay(ld: Rep[Date]): Rep[Int]
+  def dateToInt(ld: Rep[Date]): Rep[Int]
+
 }
 
 trait DateOpsExp extends DateOps with BaseExp { this: OptiQLExp =>
-  
+
   //single tasks on pure operations don't really do anything (due to code motion) and just hinder struct optimizations
-  /*case class DateObjectApply(str: Rep[String]) extends DeliteOpSingleTask[Date](reifyEffectsHere(optiql_date_from_string(str)))  
+  /*case class DateObjectApply(str: Rep[String]) extends DeliteOpSingleTask[Date](reifyEffectsHere(optiql_date_from_string(str)))
   case class DateLessThan(ld: Rep[Date], rd: Rep[Date]) extends DeliteOpSingleTask[Boolean](reifyEffectsHere(optiql_date_lt(ld,rd)))
   case class DateLessThanEqual(ld: Rep[Date], rd: Rep[Date]) extends DeliteOpSingleTask[Boolean](reifyEffectsHere(optiql_date_lte(ld,rd)))
   case class DateGreaterThan(ld: Rep[Date], rd: Rep[Date]) extends DeliteOpSingleTask[Boolean](reifyEffectsHere(optiql_date_gt(ld,rd)))

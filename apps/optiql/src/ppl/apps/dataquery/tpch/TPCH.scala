@@ -18,14 +18,14 @@ trait TPCHBaseTrait extends OptiQLApplication with Types {
   }
 
   //timing decided at staging time so we can fuse across I/O when possible
-  val timeIO: Boolean = System.getProperty("tpch.time.io", "true") != "false"
+  val timeIO: Boolean = false // System.getProperty("tpch.time.io", "true") != "false"
   override def tic(in: Rep[Any]*) = {
     if (timeIO) super.tic() //start timing immediately
     else super.tic(in:_*) //start timing after input loaded
   }
 
   val queryName: String
-  
+
   var tpchDataPath: Rep[String] = _
   val sep = "\\|"
   def loadCustomers() = Table.fromFile[Customer](tpchDataPath+"/customer.tbl", sep)
@@ -36,13 +36,13 @@ trait TPCHBaseTrait extends OptiQLApplication with Types {
   def loadParts() = Table.fromFile[Part](tpchDataPath+"/part.tbl", sep)
   def loadPartSuppliers() = Table.fromFile[PartSupplier](tpchDataPath+"/partsupp.tbl", sep)
   def loadSuppliers() = Table.fromFile[Supplier](tpchDataPath+"/supplier.tbl", sep)
-  
+
   def query(): Rep[_]
-  
+
   def main() = {
     println("TPC-H " + queryName)
     if (args.length < 1) printUsage
-    
+
     tpchDataPath = args(0)
     query()
   }
@@ -52,13 +52,13 @@ trait TPCHBaseTrait extends OptiQLApplication with Types {
 
 trait TPCHQ1Trait extends TPCHBaseTrait {
 
-  val queryName = "Q1"  
-  def query() = {  
+  val queryName = "Q1"
+  def query() = {
 
-    val lineItems = loadLineItems()         
+    val lineItems = loadLineItems()
     tic(lineItems.size)
-    
-    val q = lineItems Where(_.l_shipdate <= Date("1998-12-01")) GroupBy(l => (l.l_returnflag,l.l_linestatus)) Select(g => new Result {
+
+    val q = lineItems Where(_.l_shipdate <= Date("1998-09-02")) GroupBy(l => (l.l_returnflag,l.l_linestatus)) Select(g => new Result {
       val returnFlag = g.key._1
       val lineStatus = g.key._2
       val sumQty = g.Sum(_.l_quantity)
@@ -70,16 +70,16 @@ trait TPCHQ1Trait extends TPCHBaseTrait {
       val avgDiscount = g.Average(_.l_discount)
       val countOrder = g.Count
     }) OrderBy(_.returnFlag) ThenBy(_.lineStatus)
-    
+
     toc(q)
     q.printAsTable()
-  }    
+  }
 }
 
 
 trait TPCHQ2Trait extends TPCHBaseTrait {
-  val queryName = "Q2"  
-  
+  val queryName = "Q2"
+
   def query() = {
     val parts = loadParts(); val partSuppliers = loadPartSuppliers(); val suppliers = loadSuppliers(); val nations = loadNations(); val regions = loadRegions()
     tic(parts.size, partSuppliers.size, suppliers.size, nations.size, regions.size)
@@ -127,7 +127,7 @@ trait TPCHQ2Trait extends TPCHBaseTrait {
         val s_comment = s.s_comment
         val ps_partkey = ps.ps_partkey
         val ps_supplycost = ps.ps_supplycost
-      })    
+      })
 
     val res = allSuppliers.Join(parts).Where(p => (p.p_size == 15) && (p.p_type endsWith "BRASS"))
       .WhereEq(_.ps_partkey, _.p_partkey).Select((s,p) => new Record {
@@ -151,10 +151,10 @@ trait TPCHQ2Trait extends TPCHBaseTrait {
         val s_phone = s.s_phone
         val s_comment = s.s_comment
       }) OrderByDescending(_.s_acctbal) ThenBy(_.n_name) ThenBy(_.s_name) ThenBy(_.p_partkey)
-      
+
     toc(res)
     res.printAsTable(10)
-  }    
+  }
 }
 
 
@@ -211,7 +211,7 @@ trait TPCHQ4Trait extends TPCHBaseTrait {
         val o_orderkey = o.o_orderkey
         val o_orderpriority = o.o_orderpriority
       }) Distinct(_.o_orderkey)
-    
+
     val q = lateOrders GroupBy(_.o_orderpriority) Select { g => new Record {
       val orderPriority = g.key
       val orderCount = g.Count
@@ -230,7 +230,7 @@ trait TPCHQ6Trait extends TPCHBaseTrait {
     val lineItems = loadLineItems()
     tic(lineItems.size)
 
-    val q = lineItems Where (l => l.l_shipdate >= Date("1994-01-01") && l.l_shipdate < Date("1995-01-01") && l.l_discount >= 0.05 && l.l_discount <= 0.07 && l.l_quantity < 24) 
+    val q = lineItems Where (l => l.l_shipdate >= Date("1994-01-01") && l.l_shipdate < Date("1995-01-01") && l.l_discount >= 0.05 && l.l_discount <= 0.07 && l.l_quantity < 24)
     val revenue = q.Sum(l => l.l_extendedprice * l.l_discount)
 
     toc(revenue)
